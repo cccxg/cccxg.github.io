@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2023/06/13/Hello-World/"/>
+      <url>/2023/06/13/Hello-World/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Level-1"><a href="#Level-1" class="headerlink" title="Level 1"></a>Level 1</h2><h3 id="Level-2"><a href="#Level-2" class="headerlink" title="Level 2"></a>Level 2</h3><p>Context:<br>Hello world.<br>Hello world.</p><p>Code</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HelloWorld</span><span class="params">()</span></span>&#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;hello world&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>Table</p><table><thead><tr><th>a</th><th>b</th><th>c</th></tr></thead><tbody><tr><td>1</td><td>2</td><td>4</td></tr></tbody></table><p>Math<br>$$ y = \alpha * x^2 + \beta $$</p><p>List</p><ul><li>aaa</li><li>bbb</li><li>ccc<ul><li>ddd</li></ul></li></ul>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>
