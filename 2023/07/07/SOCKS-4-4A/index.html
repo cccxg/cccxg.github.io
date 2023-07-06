@@ -14,7 +14,7 @@
 <meta property="og:description" content="参考:SOCKS: A protocol for TCP proxy across firewallsSOCKS 4A: A Simple Extension to SOCKS 4 Protocol 简介SOCKS(Protocol for sessions traversal across firewall securely, 防火墙安全会话转换协议)是一种TCP会话转发协议, 最初由David">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-07-06T16:33:32.000Z">
-<meta property="article:modified_time" content="2023-07-06T16:55:12.792Z">
+<meta property="article:modified_time" content="2023-07-06T17:27:37.955Z">
 <meta property="article:author" content="Xiangguang Chen">
 <meta name="twitter:card" content="summary">
     
@@ -124,7 +124,7 @@
     
     
       <div id="toc">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CONNECT"><span class="toc-number">2.</span> <span class="toc-text">CONNECT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BIND"><span class="toc-number">3.</span> <span class="toc-text">BIND</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SOCKS-4A"><span class="toc-number">4.</span> <span class="toc-text">SOCKS 4A</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SOCKS-4"><span class="toc-number">2.</span> <span class="toc-text">SOCKS 4</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CONNECT"><span class="toc-number">2.1.</span> <span class="toc-text">CONNECT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BIND"><span class="toc-number">2.2.</span> <span class="toc-text">BIND</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SOCKS-4A"><span class="toc-number">3.</span> <span class="toc-text">SOCKS 4A</span></a></li></ol>
       </div>
     
   </span>
@@ -172,7 +172,7 @@
     <p>参考:<br><a target="_blank" rel="noopener" href="https://www.openssh.com/txt/socks4.protocol">SOCKS: A protocol for TCP proxy across firewalls</a><br><a target="_blank" rel="noopener" href="https://www.openssh.com/txt/socks4a.protocol">SOCKS 4A: A Simple Extension to SOCKS 4 Protocol</a></p>
 <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SOCKS(Protocol for sessions traversal across firewall securely, 防火墙安全会话转换协议)是一种TCP会话转发协议, 最初由David Koblas提出, 后续由Ying-Da Lee修改并扩展到了第4个版本(SOCKS 4). SOCKS使得用户可以无感知地穿过防火墙访问外部目标应用服务器. 当每个客户端与SOCKS服务器的TCP会话开始时, 首先SOCKS服务器会进行访问控制, 随后SOCKS服务器仅需简单地在客户端与目标应用服务器间转发数据. 因为该协议独立于应用层的协议, 所以可以(已经)被许多不同的服务所使用, 如: telnet, ftp, finger, whois, gopher, www, 等等. 同时SOCKS 4也适用于程序使用加密来保护数据的情况. </p>
 <p><strong>Note:</strong> 后续SOCKS服务器简称服务端, 目标应用服务器简称目标主机. </p>
-<p>SOCKS 4的服务过程整体可以分为两个步骤:</p>
+<h2 id="SOCKS-4"><a href="#SOCKS-4" class="headerlink" title="SOCKS 4"></a>SOCKS 4</h2><p>SOCKS 4的服务过程整体可以分为两个步骤:</p>
 <ol>
 <li><p>代理请求: 客户端建立与服务端的TCP连接, 并发送代理请求. 服务端可以根据请求的内容回复接受或者拒绝. 若接受请求, 则服务端建立一个到目标主机的TCP连接为后续数据转发做准备.</p>
 </li>
@@ -180,14 +180,14 @@
 </li>
 </ol>
 <p>SOCKS 4请求的过程中定义了两种操作: <strong>CONNECT</strong>与<strong>BIND</strong>.</p>
-<h2 id="CONNECT"><a href="#CONNECT" class="headerlink" title="CONNECT"></a>CONNECT</h2><p>CONNECT是SOCKS中最常用的操作, 适用于客户端仅需与目标主机建立一条TCP连接的情况. 当客户端希望与目标主机建立连接时, 客户端连接到SOCKS服务端并发送一个CONNECT代理请求. 请求数据包中包括目标主机的IP, 端口, 以及用户id等. CONNECT请求形式如下:</p>
+<h3 id="CONNECT"><a href="#CONNECT" class="headerlink" title="CONNECT"></a>CONNECT</h3><p>CONNECT是SOCKS中最常用的操作, 适用于客户端仅需与目标主机建立一条TCP连接的情况. 当客户端希望与目标主机建立连接时, 客户端连接到SOCKS服务端并发送一个CONNECT代理请求. 请求数据包中包括目标主机的IP, 端口, 以及用户id等. CONNECT请求形式如下:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">        +----+----+----+----+----+----+----+----+----+----+....+----+</span><br><span class="line">        | VN | CD | DSTPORT |      DSTIP        | USERID       |NULL|</span><br><span class="line">        +----+----+----+----+----+----+----+----+----+----+....+----+</span><br><span class="line">字节长度   1    1       2              4          可变长度         1</span><br><span class="line"></span><br><span class="line">其中: </span><br><span class="line">    - VN: SOCKS协议版本, 此处值应为4.</span><br><span class="line">    - CD: SOCKS操作码, CONNECT对应的值为1.</span><br><span class="line">    - DSTPORT: 目标主机端口.</span><br><span class="line">    - DSTIP: 目标主机IP.</span><br><span class="line">    - USERID: 用户id.</span><br><span class="line">    - NULL: 一个全0字节.</span><br></pre></td></tr></table></figure>
 
 <p>服务端根据客户端IP, 目标主机IP, 目标主机端口, 用户id, 以及可能携带的认证信息(IDENT, 参见RFC 1413)来确定是否接受客户端CONNECT代理请求. 若接收请求, 服务端建立一个到目标主机指定端口的TCP连接. 当服务端到目标主机的连接建立成功, 或服务端拒绝了客户端请求, 或服务端操作失败(无法连接到目标)时, 服务端向客户端发送如下形式的回复:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">        +----+----+----+----+----+----+----+----+</span><br><span class="line">        | VN | CD | DSTPORT |      DSTIP        |</span><br><span class="line">        +----+----+----+----+----+----+----+----+</span><br><span class="line">字节长度   1    1       2              4</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VN: 回复码版本, 此处值应为0.</span><br><span class="line">    - CD: 结果代码:</span><br><span class="line">        - 90: 请求准许;</span><br><span class="line">        - 91: 请求被拒或操作失败;</span><br><span class="line">        - 92: 请求被拒, 因为服务端无法连接到客户端的identd(参见RFC 1413);</span><br><span class="line">        - 93: 请求被拒, 因为客户端和identd(参见RFC 1413)报告了不一样的用户id.</span><br><span class="line">    - DSTPORT, DSTIP: 无实际意义, 仅是为了兼容性考虑(后文BIND操作的回复中有实际含义).</span><br></pre></td></tr></table></figure>
 
 <p>当服务端操作失败或拒绝客户端代理请求时, 服务端向客户端发送回复消息后立即关闭它们之间的连接. 对于成功的请求, 服务端向客户端发送回复消息后立即开始进行双向数据转发. 这使得客户端可以在它到服务端的连接上进行I/O操作, 就好像它直接连接到了目标主机一样. </p>
-<h2 id="BIND"><a href="#BIND" class="headerlink" title="BIND"></a>BIND</h2><p>BIND操作适用于客户端需要接受一个由目标主机发起的入站连接的情况. 入站连接的建立必须在客户端主动发起的到目标主机之间的主要连接已经建立之后. 这个过程通常是如下的一系列操作:</p>
+<h3 id="BIND"><a href="#BIND" class="headerlink" title="BIND"></a>BIND</h3><p>BIND操作适用于客户端需要接受一个由目标主机发起的入站连接的情况. 入站连接的建立必须在客户端主动发起的到目标主机之间的主要连接已经建立之后. 这个过程通常是如下的一系列操作:</p>
 <ol>
 <li>客户端向目标主机建立主要连接;</li>
 <li>客户端获取一个socket, 并获取该socket绑定的IP及端口;</li>
@@ -239,7 +239,7 @@
     
     
       <div id="toc-footer" style="display: none">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CONNECT"><span class="toc-number">2.</span> <span class="toc-text">CONNECT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#BIND"><span class="toc-number">3.</span> <span class="toc-text">BIND</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SOCKS-4A"><span class="toc-number">4.</span> <span class="toc-text">SOCKS 4A</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SOCKS-4"><span class="toc-number">2.</span> <span class="toc-text">SOCKS 4</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CONNECT"><span class="toc-number">2.1.</span> <span class="toc-text">CONNECT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BIND"><span class="toc-number">2.2.</span> <span class="toc-text">BIND</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SOCKS-4A"><span class="toc-number">3.</span> <span class="toc-text">SOCKS 4A</span></a></li></ol>
       </div>
     
 
