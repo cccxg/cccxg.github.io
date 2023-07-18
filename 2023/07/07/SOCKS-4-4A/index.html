@@ -14,7 +14,7 @@
 <meta property="og:description" content="参考:SOCKS: A protocol for TCP proxy across firewallsSOCKS 4A: A  Simple Extension to SOCKS 4 Protocol 简介SOCKS(Protocol for sessions traversal across firewall securely, 防火墙安全会话转换协议)是一种TCP会话转发协议, 最初由Davi">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-07-06T16:33:32.000Z">
-<meta property="article:modified_time" content="2023-07-08T13:50:47.907Z">
+<meta property="article:modified_time" content="2023-07-18T15:30:14.336Z">
 <meta property="article:author" content="Xiangguang Chen">
 <meta name="twitter:card" content="summary">
     
@@ -92,6 +92,8 @@
     <br/>
     <span id="actions">
       <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/07/18/SOCKS-5/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
         
         
         <li><a class="icon" aria-label="下一篇" href="/2023/06/13/Hello-World/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
@@ -193,7 +195,7 @@
 <p>SOCKS BIND操作的目标就是通过代理支持上述操作, 重点是入站连接是从目标主机连接到SOCKS服务端, 而不是连接到客户端. </p>
 <p><strong>Note:</strong> BIND操作所做的就是在SOCKS服务端获取一个等待入站连接的socket, 将这个socket所绑定的IP及端口通知给客户端, 并在这个socket上监听来自目标主机的入站连接. 将socket绑定的IP及端口通知给目标主机是客户端的工作, 服务端并不关心客户端具体如何通知目标主机. 在BIND操作之前, 需要客户端与目标主机已经建立了一条主要连接, 使得客户端可以通知目标主机需要连接的socket IP及端口. 通常主要连接是客户端提前通过SOCKS CONNECT操作建立好的. (协议原文这部分写的比较晦涩, 很容易产生歧义, 让人误以为主要连接的建立是BIND操作的一部分, 事实上它们是无关的). </p>
 <p>BIND操作中客户端向SOCKS服务端发送如下形式的代理请求:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">		+----+----+----+----+----+----+----+----+----+----+....+----+</span><br><span class="line">		| VN | CD | DSTPORT |      DSTIP        | USERID       |NULL|</span><br><span class="line">		+----+----+----+----+----+----+----+----+----+----+....+----+</span><br><span class="line">字节长度   1    1      2              4           可变长度         1</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VN: SOCKS协议版本号, 此处为4.</span><br><span class="line">    - CD: SOCKS操作码, BIND对应的值为2.</span><br><span class="line">    - DSTPORT, DSTIP: 目标应用服务端口, IP.</span><br><span class="line">    - USERIP: 用户id.</span><br><span class="line">    - NULL: 全0字节</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">        +----+----+----+----+----+----+----+----+----+----+....+----+</span><br><span class="line">        | VN | CD | DSTPORT |      DSTIP        | USERID       |NULL|</span><br><span class="line">        +----+----+----+----+----+----+----+----+----+----+....+----+</span><br><span class="line">字节长度   1    1      2              4           可变长度         1</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VN: SOCKS协议版本号, 此处为4.</span><br><span class="line">    - CD: SOCKS操作码, BIND对应的值为2.</span><br><span class="line">    - DSTPORT, DSTIP: 目标应用服务端口, IP.</span><br><span class="line">    - USERIP: 用户id.</span><br><span class="line">    - NULL: 全0字节</span><br></pre></td></tr></table></figure>
 
 <p>SOCKS服务端根据上述代理请求信息, 以及客户端源IP等信息, 确认是否接受客户端的请求. 服务端对BIND请求的回复CONNECT请求回复形式一致:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">        +----+----+----+----+----+----+----+----+</span><br><span class="line">        | VN | CD | DSTPORT |      DSTIP        |</span><br><span class="line">        +----+----+----+----+----+----+----+----+</span><br><span class="line">字节长度   1    1       2              4</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VN: 回复码版本, 此处值应为0.</span><br><span class="line">    - CD: 结果代码</span><br><span class="line">        - 90: 请求准许.</span><br><span class="line">        - 91: 请求被拒或操作失败.</span><br><span class="line">        - 92: 请求被拒, 因为SOCKS服务端无法连接到客户端的identd(参见RFC 1413).</span><br><span class="line">        - 93: 请求被拒, 因为客户端和identd(参见RFC 1413)报告了不一样的用户id.</span><br></pre></td></tr></table></figure>

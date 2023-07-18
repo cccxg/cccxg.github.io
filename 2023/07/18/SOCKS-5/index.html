@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="参考:RFC 1928: SOCKS Protocol Version 5RFC 1929: Username&#x2F;Password Authentication for SOCKS V5 简介SOCKS 5描述的协议是对SOCKS 4协议的升级. 关于SOCKS 4的介绍可以查看本博客先前的post: SOCKS 4&#x2F;4A TCP代理协议 SOCKS 5协议旨在为TCP和UDP域中的C&#x2F;S架构应用程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SOCKS 5 代理协议">
+<meta property="og:url" content="https://cccxg.github.io/2023/07/18/SOCKS-5/index.html">
+<meta property="og:site_name" content="Chen-XG">
+<meta property="og:description" content="参考:RFC 1928: SOCKS Protocol Version 5RFC 1929: Username&#x2F;Password Authentication for SOCKS V5 简介SOCKS 5描述的协议是对SOCKS 4协议的升级. 关于SOCKS 4的介绍可以查看本博客先前的post: SOCKS 4&#x2F;4A TCP代理协议 SOCKS 5协议旨在为TCP和UDP域中的C&#x2F;S架构应用程">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-18T15:23:31.000Z">
+<meta property="article:modified_time" content="2023-07-18T16:01:07.743Z">
+<meta property="article:author" content="Xiangguang Chen">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>SOCKS 5 代理协议</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+		<script type="text/x-mathjax-config">
+		  MathJax.Hub.Config({
+			tex2jax: {
+			  skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+			  inlineMath: [['$','$']]
+			}
+		  });
+		</script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+	
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a href="/categories/">分类</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/07/07/SOCKS-4-4A/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cccxg.github.io/2023/07/18/SOCKS-5/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&text=SOCKS 5 代理协议"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&is_video=false&description=SOCKS 5 代理协议"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SOCKS 5 代理协议&body=Check out this article: https://cccxg.github.io/2023/07/18/SOCKS-5/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&name=SOCKS 5 代理协议&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cccxg.github.io/2023/07/18/SOCKS-5/&t=SOCKS 5 代理协议"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8ETCP%E7%9A%84%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.</span> <span class="toc-text">基于TCP的客户端操作步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CONNECT"><span class="toc-number">2.1.</span> <span class="toc-text">CONNECT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BIND"><span class="toc-number">2.2.</span> <span class="toc-text">BIND</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UDP-ASSOCIATE"><span class="toc-number">2.3.</span> <span class="toc-text">UDP ASSOCIATE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8EUDP%E7%9A%84%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">3.</span> <span class="toc-text">基于UDP的客户端操作步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E5%90%8D%E5%AF%86%E7%A0%81%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">用户名密码认证过程</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        SOCKS 5 代理协议
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Xiangguang Chen</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-07-18T15:23:31.000Z" class="dt-published" itemprop="datePublished">2023-07-18</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a> › <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/SOCKS%E4%BB%A3%E7%90%86/">SOCKS代理</a>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>参考:<br><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc1928">RFC 1928: SOCKS Protocol Version 5</a><br><a target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc1929">RFC 1929: Username/Password Authentication for SOCKS V5</a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>SOCKS 5描述的协议是对SOCKS 4协议的升级. 关于SOCKS 4的介绍可以查看本博客先前的post: <a href="https://cccxg.github.io/2023/07/07/SOCKS-4-4A/">SOCKS 4/4A TCP代理协议</a></p>
+<p>SOCKS 5协议旨在为TCP和UDP域中的C/S架构应用程序提供一种框架, 以便应用程序可以方便, 安全地使用代理服务穿过防火墙. 从概念上来看, SOCKS 5协议作用于应用层和传输层之间, 因此不为网络层提供服务, 例如转发ICMP消息. 相比SOCKS 4, SOCKS 5进行了以下扩展: 支持UDP, 多种通用的认证方案, 支持域名/IPv6的寻址策略. </p>
+<p>与SOCKS 4类似, SOCKS 5的服务过程也可以分为两个阶段:</p>
+<ol>
+<li>代理请求: 客户端建立与SOCKS服务端的TCP连接, 并发送代理请求. 服务端可以根据请求的内容回复接受或者拒绝. 若接受请求, 则服务端建立对应的连接为后续数据转发做准备.</li>
+<li>转发数据: 请求过程完成后, SOCKS服务端仅需简单地在客户端与目标主机之间转发数据即可.</li>
+</ol>
+<p>SOCKS 5支持TCP和UDP, 同时也定义了CONNECT操作与BIND操作, 并额外定义了一个UDP ASSOCIATE操作. </p>
+<p><strong>Note:</strong> 尽管都支持CONNECT操作与BIND操作, 但是SOCKS 5与SOCKS 4并不兼容, SOCKS 5定义了新的数据包形式, 所以SOCKS 5服务器无法解析SOCKS 4请求. CONNECT与BIND的一致是概念上的, 而不是形式上的. </p>
+<h2 id="基于TCP的客户端操作步骤"><a href="#基于TCP的客户端操作步骤" class="headerlink" title="基于TCP的客户端操作步骤"></a>基于TCP的客户端操作步骤</h2><p>当一个TCP客户端希望连接到一个仅能通过防火墙访问的目标主机时, 它可以通过建立一个到SOCKS服务端对应端口的TCP连接来实现. SOCKS服务通常监听1080端口. 客户端到服务端的TCP连接建立成功后, 客户端: 1.进入认证方法协商阶段, 2.使用指定的方法进行身份认证, 3.发送转发请求. 服务端评估转发请求, 建立对应的连接或拒绝请求. </p>
+<p>除非特殊说明, 后文数据包中的数字都表示对应字段的字节长度. <code>0xhh</code>表示该字段的值为指定值. <code>Variable</code>表示对应字段的值的字节长度可变.</p>
+<p>客户端连接到SOCKS服务端后首先发送版本标识符/认证方法协商消息:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">    +-----+----------+----------+</span><br><span class="line">    | VER | NMETHODS | METHODS  |</span><br><span class="line">    +-----+----------+----------+</span><br><span class="line">    |  1  |    1     | 1 to 255 |</span><br><span class="line">    +-----+----------+----------+</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VER: SOCKS版本号, 此处为0x05.</span><br><span class="line">    - NMETHODS: 客户端支持的认证方法数量.</span><br><span class="line">    - METHODS: 客户端支持的认证方法列表, 每一个字节对应一种认证方法. </span><br></pre></td></tr></table></figure>
+
+<p>SOCKS服务端选择指定的认证方法, 并回复客户端:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">    +-----+--------+</span><br><span class="line">    | VER | METHOD |</span><br><span class="line">    +-----+--------+</span><br><span class="line">    |  1  |   1    |</span><br><span class="line">    +-----+--------+</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VER: SOCKS版本号, 此处为0x05.</span><br><span class="line">    - METHOD: 服务端指定的认证方法</span><br><span class="line">        - 0x00: 无需认证.</span><br><span class="line">        - 0x01: GSSAPI(Generic Security Services API).</span><br><span class="line">        - 0x02: 用户名密码认证.</span><br><span class="line">        - 0x03 ~ 0x7F: IANA保留.</span><br><span class="line">        - 0x80 ~ 0xFE: 保留的私有方法.</span><br><span class="line">        - 0xFF: 没有接受的方法(服务端支持的方法未在客户端提供的方法列表中给出).</span><br></pre></td></tr></table></figure>
+
+<p>随后, SOCKS服务端与客户端进入指定认证方法的认证阶段. 不同的认证方法的认证流程由不同的协议规定, 后面的章节将介绍基于用户名密码的认证方法(RFC 1929). </p>
+<p>认证阶段结束后, 客户端将发送代理请求的详细信息. 如果协商的认证方法包括了完整性的校验和/或机密性的封装，这些请求必须使用对应的方法封装. </p>
+<p>SOCKS代理请求形式如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">    +-----+-----+-------+------+----------+----------+</span><br><span class="line">    | VER | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |</span><br><span class="line">    +-----+-----+-------+------+----------+----------+</span><br><span class="line">    |  1  |  1  | 0x00  |  1   | Variable |    2     |</span><br><span class="line">    +-----+-----+-------+------+----------+----------+</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VER: SOCKS协议版本, 此处为0x05.</span><br><span class="line">    - CMD:</span><br><span class="line">        - 0x01: CONNECT操作.</span><br><span class="line">        - 0x02: BIND操作.</span><br><span class="line">        - 0x03: UDP ASSOCIATE操作.</span><br><span class="line">    - RSV: 保留字段.</span><br><span class="line">    - ATYPE: 目标主机地址类型</span><br><span class="line">        - 0x01: IPv4.</span><br><span class="line">        - 0x03: Domain name.</span><br><span class="line">        - 0x04: IPv6.</span><br><span class="line">    - DST.ADDR: 目标主机地址</span><br><span class="line">        - IPv4 4个字节.</span><br><span class="line">        - Domain name n+1个字节, 第一个字节表示域名长度n, 后续n个字节为域名.</span><br><span class="line">        - IPv6 16个字节.</span><br><span class="line">    - DST.PORT: 目标主机端口.</span><br></pre></td></tr></table></figure>
+
+<p>身份认证流程结束后, 客户端立即向服务端发送代理请求. 服务端评估请求, 并且返回如下形式的回复:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">    +-----+-----+-------+------+----------+----------+</span><br><span class="line">    | VER | REP |  RSV  | ATYP | BND.ADDR | BND.PORT |</span><br><span class="line">    +-----+-----+-------+------+----------+----------+</span><br><span class="line">    |  1  |  1  | 0x00  |  1   | Variable |    2     |</span><br><span class="line">    +-----+-----+-------+------+----------+----------+</span><br><span class="line"></span><br><span class="line">其中: </span><br><span class="line">    - VER: SOCKS协议版本, 此处为0x05.</span><br><span class="line">    - REP: 回复状态代码</span><br><span class="line">        - 0x00: 成功.</span><br><span class="line">        - 0x01: 服务端错误.</span><br><span class="line">        - 0x02: 规则集禁止访问.</span><br><span class="line">        - 0x03: 网络不可达.</span><br><span class="line">        - 0x04: 主机不可达.</span><br><span class="line">        - 0x05: 连接被拒.</span><br><span class="line">        - 0x06: TTL超时.</span><br><span class="line">        - 0x07: 不支持的CMD操作符.</span><br><span class="line">        - 0x08: 不支持的目标主机地址类型.</span><br><span class="line">        - 0x09 ~ 0xFF: 未指定.</span><br><span class="line">    - RSV: 保留字符, 固定为0x00.</span><br><span class="line">    - ATYP: 绑定地址类型</span><br><span class="line">        - 0x01: IPv4.</span><br><span class="line">        - 0x03: Domain name.</span><br><span class="line">        - 0x04: IPv6.</span><br><span class="line">    - BND.ADDR: 服务端(与目标主机的连接)绑定的地址.</span><br><span class="line">    - BND.PORT: 服务端(与目标主机的连接)绑定的端口.</span><br></pre></td></tr></table></figure>
+
+<p>如果先前选择的认证方法包含用于身份验证, 完整性和(或)机密性的封装, 则SOCKS服务端的回复也将被对应方法封装.</p>
+<p>当回复信息为失败(REP不等于0)时, SOCKS服务端必须在发送回复后关闭TCP连接, 这之间的间隔不应该超过10秒. </p>
+<p>当回复信息为成功(REP等于0), 并且代理请求的操作类型是CONNCET或BIND时, 客户端接收到回复即可以开始传输数据. 如果先前选择的认证方法包含用于身份验证, 完整性和(或)机密性的封装, 则客户端传输的数据也将被对应方法封装. 类似地, 当目标主机发送给客户端的数据数据到达SOCKS服务端时, 服务端必须按照对应的方法封装后再转发给客户端. </p>
+<h3 id="CONNECT"><a href="#CONNECT" class="headerlink" title="CONNECT"></a>CONNECT</h3><p>SOCKS服务端对CONNECT请求(客户端代理请求中CMD为0x01)的回复中, BND.PORT表示服务端分配的连接到目标主机的端口号. 同理, BND.ADDR包含被分配的IP. 通常, 服务端提供的用于连接目标主机的IP与客户端连接服务端所使用的IP并不相同, 因为服务端通常是多地址的. 服务端应该使用目标主机地址, 端口以及客户端的源IP, 端口评估是否接受CONNECT代理请求. </p>
+<h3 id="BIND"><a href="#BIND" class="headerlink" title="BIND"></a>BIND</h3><p>BIND代理请求适用于客户端需要接受从目标主机发起的入站连接的情况. FTP是一个常见的例子, FTP使用客户端到目标主机的主要连接传输命令以及状态报告, 而使用目标主机到客户端的连接传输数据.</p>
+<p>SOCKS协议所预期的行为是: 客户端应用协议在使用CONNECT代理请求成功建立主要连接后才使用BIND代理请求用于建立第二个连接. SOCKS服务端将使用BIND代理请求中的目标主机地址及端口评估是否接受请求.</p>
+<p>BIND操作期间SOCKS服务端将向客户端回复两次消息. 第一次回复发送于服务端创建并且绑定一个新的socket时. 回复中的BND.PORT字段包含服务端分配的用于监听入站连接的端口. 回复中的BND.ADDR字段包含服务端分配的用于监听入站连接的IP. 客户端需要将这两个字段通知(通过主要连接或者控制连接)目标主机. 第二次回复发送于目标主机到服务端的入站连接建立成功或失败时. 第二次回复中的BND.PORT及BND.ADDR字段包含服务端所连接到的主机的地址. </p>
+<h3 id="UDP-ASSOCIATE"><a href="#UDP-ASSOCIATE" class="headerlink" title="UDP ASSOCIATE"></a>UDP ASSOCIATE</h3><p>UDP ASSOCIATE代理请求用于建立UDP连接以转发UDP数据报. DST.ADDR, DST.PORT包含客户端用于发送UDP数据包的地址及端口. SOCKS服务端可以使用这些信息限制访问. 如果客户端在建立UDP连接时不拥有这些信息, 则客户端必须使用全零的端口号和地址. </p>
+<p>客户端与SOCKS服务端之间的TCP连接(客户端与服务端协商认证方法, 发送代理请求时所使用的TCP连接)中止时, 后续的UDP连接也随之中止. </p>
+<p>SOCKS服务端针对UDP ASSOCIATE的回复中, BND.PORT, BND.ADDR指定了用于转发的地址及端口, 客户端必须发送需要转发的UDP信息到服务端指定的地址及端口. </p>
+<h2 id="基于UDP的客户端操作步骤"><a href="#基于UDP的客户端操作步骤" class="headerlink" title="基于UDP的客户端操作步骤"></a>基于UDP的客户端操作步骤</h2><p>SOCKS服务端接收来自客户端的UDP ASSOCIATE代理请求, 后会评估代理请求, 请求通过后, 服务端分配一个端口用于监听该客户端的UDP数据报, 并通过代理请求回复消息中的BND.PORT字段通知客户端对应的端口. 运行在这个端口上的监听程序称为UDP转发服务端.</p>
+<p>UDP客户端必须发送需要转发的UDP数据报到UDP转发服务端上. 如果先前选择的认证方法包含用于身份验证, 完整性和(或)机密性的封装, 则客户端传输的UDP数据报也将使用对应方法封装. 每一个UDP数据包携带如下头部: </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">    +-----+------+------+----------+----------+----------+</span><br><span class="line">    | RSV | FRAG | ATYP | DST.ADDR | DST.PORT |   DATA   |</span><br><span class="line">    +-----+------+------+----------+----------+----------+</span><br><span class="line">    |  2  |  1   |  1   | Variable |    2     | Variable |</span><br><span class="line">    +-----+------+------+----------+----------+----------+</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - RSV: 保留字段, 必须为0x0000.</span><br><span class="line">    - FRAG: UDP数据报的编号.</span><br><span class="line">    - ATYPE: 目标主机地址类型.</span><br><span class="line">        - 0x01: IPv4.</span><br><span class="line">        - 0x03: Domain name.</span><br><span class="line">        - 0x04: IPv6.</span><br><span class="line">    - DST.ADDR: 目标主机地址.</span><br><span class="line">        - IPv4 4个字节.</span><br><span class="line">        - Domain name n+1个字节, 第一个字节表示域名长度n, 后续n个字节为域名.</span><br><span class="line">        - IPv6 16个字节.</span><br><span class="line">    - DST.PORT: 目标主机端口.</span><br><span class="line">    - DATA: 携带的数据. </span><br></pre></td></tr></table></figure>
+
+<p>UDP转发服务端决定转发UDP数据包时, 服务端不会向客户端返回任何消息, 仅仅是安静的转发数据. 类似地, 当服务端丢弃UDP数据包或者无法转发时, 也不会通知客户端. 当转发服务端接收到目标主机的回复数据报时, 服务端也会使用上面的头部信息以及身份认证方法对应的方法来封装UDP数据包. </p>
+<p>UDP转发服务端必须从SOCKS服务端取得它所服务的客户端IP地址, 并且丢弃任何来源于其他地址的数据报(每个转发服务端都是为了服务唯一一个客户端而建立的).</p>
+<p>FRAG字段表示该UDP数据报是不是一系列的数据报中的一个片段. 0x00表示独立的数据报. 1~127表示该片段在整体中的顺序编号, 最高位的1比特用于表示是否为最后一个片段. 对每一个数据报序列, 其消息接收者(转发服务端)都将维护一个组装队列以及组装计时器. 当计时器超时, 或者最新接收到的数据报片段的FRAG字段值小于已接收的数据报片段中的最大值时, 组装队列将被重置并且丢弃已接收的相关数据报片段. 组装计时器的超时时间不能小于5秒. 建议应用程序应该尽量避免碎片化传输. </p>
+<p>SOCKS服务端对于是否支持数据报组装是可选的; 不支持的服务端应该丢弃任何FRAG字段不为0x00的数据报.</p>
+<h2 id="用户名密码认证过程"><a href="#用户名密码认证过程" class="headerlink" title="用户名密码认证过程"></a>用户名密码认证过程</h2><p>当客户端支持用户名密码认证, 并且服务端指定的方法为用户名密码认证时(<code>METHOD</code>字段值为<code>0x02</code>), 客户端与服务端进入身份认证的子协商阶段. 该阶段始于客户端提交的用户名密码请求:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    +-----+------+----------+------+----------+</span><br><span class="line">    | VER | ULEN |  UNAME   | PLEN |  PASSWD  |</span><br><span class="line">    +-----+------+----------+------+----------+</span><br><span class="line">    |  1  |  1   | 1 to 255 |  1   | 1 to 255 |</span><br><span class="line">    +-----+------+----------+------+----------+</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VER: 当前子协商的版本, 此处为0x01.</span><br><span class="line">    - ULEN: 用户名的长度.</span><br><span class="line">    - PLEN: 密码长度.</span><br><span class="line">    - UNAME: 用户名.</span><br><span class="line">    - PASSWD: 密码.</span><br></pre></td></tr></table></figure>
+
+<p>服务端将验证用户名和密码, 并回复:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    +-----+--------+</span><br><span class="line">    | VER | STATUS |</span><br><span class="line">    +-----+--------+</span><br><span class="line">    |  1  |   1    |</span><br><span class="line">    +-----+--------+</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">    - VER: 子协商版本, 此处为0x01.</span><br><span class="line">    - STATUS: </span><br><span class="line">        - 0x00 - 认证成功.</span><br><span class="line">        - 其他 - 认证失败.</span><br></pre></td></tr></table></figure>
+
+<p>若认证失败时, 服务端必须关闭连接. 当认证成功时, 服务端与客户端进入后续的协商阶段(代理请求, 以及评估代理请求).</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a href="/categories/">分类</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8ETCP%E7%9A%84%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.</span> <span class="toc-text">基于TCP的客户端操作步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CONNECT"><span class="toc-number">2.1.</span> <span class="toc-text">CONNECT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BIND"><span class="toc-number">2.2.</span> <span class="toc-text">BIND</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UDP-ASSOCIATE"><span class="toc-number">2.3.</span> <span class="toc-text">UDP ASSOCIATE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8EUDP%E7%9A%84%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">3.</span> <span class="toc-text">基于UDP的客户端操作步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E5%90%8D%E5%AF%86%E7%A0%81%E8%AE%A4%E8%AF%81%E8%BF%87%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">用户名密码认证过程</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://cccxg.github.io/2023/07/18/SOCKS-5/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&text=SOCKS 5 代理协议"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&is_video=false&description=SOCKS 5 代理协议"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SOCKS 5 代理协议&body=Check out this article: https://cccxg.github.io/2023/07/18/SOCKS-5/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&title=SOCKS 5 代理协议"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://cccxg.github.io/2023/07/18/SOCKS-5/&name=SOCKS 5 代理协议&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://cccxg.github.io/2023/07/18/SOCKS-5/&t=SOCKS 5 代理协议"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2023
+    Xiangguang Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a href="/categories/">分类</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
